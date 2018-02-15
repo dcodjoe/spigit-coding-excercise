@@ -1,0 +1,75 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Spigit demo</title>
+    <style>
+        #header{
+            border: 1px solid #ddd;  
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+</head>
+<body>
+
+    <div id="chatTable" align="center"></div>
+
+    <script>
+        var data = null, idea = null;
+       
+        $.ajax({
+            type: 'GET',
+            url: "data.json",
+            data: data,
+            async: false,
+            beforeSend: function (xhr) {
+                if (xhr && xhr.overrideMimeType) {
+                    xhr.overrideMimeType('application/json;charset=utf-8');
+                }
+            },
+            dataType: 'json',
+
+            success: function (data) {
+                //Do stuff with the JSON data
+                $('#chatTable').append('<table >').append('<tr id="header" style="background-color:purple"><td style="color:white">Activity<td><tr>');
+                for (var i = 0; i < data.data.recentActivities.length; i++) {
+                    img = "<img src=" + data.data.recentActivities[i].authorAvatar + " />";
+                    if (data.data.recentActivities[i].nodeTypeString.toLowerCase() == "comment") {
+                        idea = "commented on idea";
+                    }
+                    else if (data.data.recentActivities[i].nodeTypeString.toLowerCase() == "idea") {
+                        idea = "Posted an Idea"
+                    }
+                    else if (data.data.recentActivities[i].nodeTypeString.toLowerCase() == "reply") {
+                        idea = "replied on the idea";
+                    }
+                    var timesp = new Date(data.data.recentActivities[0].postDate) - new Date(data.data.recentActivities[i].postDate)
+                    var tms = getTimeMsg(timesp);
+                    $('#chatTable')
+                        .append('<tr><td id="test2" align="left">' + img + " " + data.data.recentActivities[i].author +" <i>" +idea+ '</i></td></tr></br>')
+                        .append('<tr><td>' + data.data.recentActivities[i].title + '</td></tr>')
+                        .append('<tr><td style="color:grey"><i>' + tms + '</i></td></tr>');
+
+                };
+                $('#chatTable').append('</table>');
+            }
+        });
+
+        function getTimeMsg(milsec) {
+            var sec = milsec / 1000;
+            if (sec <= 59 && sec >= 0) {
+                return "a few sec ago"
+            }
+            else if (sec >= 60 && sec <= 119) {
+                return "a minute ago"
+            }
+            else if (sec >= 120) {
+                var min = parseInt(parseInt(sec) / 60);
+                return min + " minutes ago"
+            }
+        }
+
+    </script>
+
+</body>
+</html>
